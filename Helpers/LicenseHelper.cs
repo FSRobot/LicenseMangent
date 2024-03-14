@@ -56,9 +56,9 @@ namespace LicenseManagement.Helpers
         public EncryptDetails(string str)
         {
             AesKey = str.Substring(0, 16);
-            AesLength = Convert.ToInt32(str.Substring(16, 2), 16);
-            AesContent = str.Substring(18, AesLength);
-            RsaContent = str.Substring(18 + AesLength);
+            AesLength = Convert.ToInt32(str.Substring(16, 4), 16);
+            AesContent = str.Substring(20, AesLength);
+            RsaContent = str.Substring(20 + AesLength);
         }
 
         public EncryptDetails()
@@ -67,7 +67,7 @@ namespace LicenseManagement.Helpers
         }
 
         public override string ToString()
-            => AesKey + AesLength.ToString("X") + AesContent + RsaContent;
+            => AesKey + AesLength.ToString("X").PadLeft(4,'0') + AesContent + RsaContent;
     }
 
     public class License
