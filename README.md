@@ -5,6 +5,7 @@ AES16Key+AESDataLength+AESDATA+RSA(AESDATA)
 
 最新版采用rsa 8192,只要私钥不泄露即可保证激活码签发安全性
 数据库没有加密,如需请自定义或联系我
+此版本携带自定义数据上限至0XFFFF
 
 右键点击[Publick Key]在程序运行目录下生成pkey.key文件,此文件为公钥文件,可以公开.
 
