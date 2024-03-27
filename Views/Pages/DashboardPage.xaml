@@ -36,9 +36,9 @@
             Margin="20,0,20,20"
             VerticalAlignment="Top"
             HorizontalContentAlignment="Right"
-            MouseRightButtonDown="ExportPublicKey"
             VerticalContentAlignment="Center"
-            Icon="{ui:SymbolIcon LockClosed24}">
+            Icon="{ui:SymbolIcon LockClosed24}"
+            MouseRightButtonDown="ExportPublicKey">
             <ui:CardExpander.Header>
                 <TextBlock
                     VerticalAlignment="Center"
@@ -115,7 +115,7 @@
                             <ui:TextBox
                                 Width="150"
                                 Margin="10,0,10,0"
-                                PlaceholderText="Email"
+                                PlaceholderText="MachineCode"
                                 Text="{Binding ViewModel.MachineCode}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
@@ -159,16 +159,22 @@
                                     Margin="20,0,0,0"
                                     HorizontalAlignment="Right"
                                     HorizontalContentAlignment="Right"
+                                    Command="{Binding ViewModel.ChangeYearRangeCommand}"
+                                    CommandParameter="1"
                                     Content="一年" />
                                 <ui:Button
                                     Margin="20,0,0,0"
                                     HorizontalAlignment="Right"
                                     HorizontalContentAlignment="Right"
+                                    Command="{Binding ViewModel.ChangeYearRangeCommand}"
+                                    CommandParameter="5"
                                     Content="五年" />
                                 <ui:Button
                                     Margin="20,0,0,0"
                                     HorizontalAlignment="Right"
                                     HorizontalContentAlignment="Right"
+                                    Command="{Binding ViewModel.ChangeYearRangeCommand}"
+                                    CommandParameter="-1"
                                     Content="永久" />
                             </StackPanel>
                         </ui:CardExpander>

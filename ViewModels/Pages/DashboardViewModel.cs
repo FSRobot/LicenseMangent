@@ -49,6 +49,14 @@ namespace LicenseManagement.ViewModels.Pages
         [ObservableProperty] private string _disableVersionList = string.Empty;
 
         [RelayCommand]
+        private void ChangeYearRange(object obj)
+        {
+            if (obj is string s && int.TryParse(s, out int range))
+            {
+                EndDate = range < 1 ? DateTime.MaxValue : BeginDate.AddYears(range);
+            }
+        }
+        [RelayCommand]
         private void OnSubmit()
         {
             License license = new()
@@ -119,7 +127,7 @@ namespace LicenseManagement.ViewModels.Pages
             }
             else
             {
-                Helper.GenerateKeyPair(); 
+                Helper.GenerateKeyPair();
                 Context.RsaSecret.Add(new RsaSecretModel()
                 {
                     CreateDate = DateTime.Now,
