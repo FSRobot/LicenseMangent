@@ -42,6 +42,7 @@ namespace LicenseManagement.ViewModels.Pages
         [ObservableProperty] private string _name = string.Empty;
         [ObservableProperty] private string _email = string.Empty;
         [ObservableProperty] private string _machineCode = string.Empty;
+        [ObservableProperty] private string _productName = string.Empty;
         [ObservableProperty] private int _totalRun = -1;
         [ObservableProperty] private DateTime _beginDate = DateTime.Now;
         [ObservableProperty] private DateTime _endDate = DateTime.MaxValue;
@@ -62,6 +63,7 @@ namespace LicenseManagement.ViewModels.Pages
             License license = new()
             {
                 Id = Guid.NewGuid().ToString("N"),
+                ProductName = ProductName,
                 Name = Name,
                 Email = Email,
                 MachineCode = MachineCode,
@@ -96,14 +98,15 @@ namespace LicenseManagement.ViewModels.Pages
 
             try
             {
+                //reg add HKLM\SOFTWARE\WOW6432Node\JKSoft /v product /t REG_SZ /d "激活码"
                 Clipboard.Clear();
-                Clipboard.SetText(details.ToString());
+                Clipboard.SetText($"reg add HKLM\\SOFTWARE\\WOW6432Node\\JKSoft /v {license.ProductName} /t REG_SZ /d {details.ToString()}");
             }
             catch (Exception e)
             {
                 Debug.WriteLine(e);
             }
-
+            
             Name = string.Empty;
             Email = string.Empty;
             MachineCode = string.Empty;

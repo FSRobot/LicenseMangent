@@ -98,6 +98,7 @@
                             <ui:TextBlock Text="客户名称:" />
                             <ui:TextBox
                                 Width="130"
+                                Height="35"
                                 Margin="10,0,10,0"
                                 PlaceholderText="Name"
                                 Text="{Binding ViewModel.Name}" />
@@ -106,6 +107,7 @@
                             <ui:TextBlock Text="客户邮箱:" />
                             <ui:TextBox
                                 Width="150"
+                                Height="35"
                                 Margin="10,0,10,0"
                                 PlaceholderText="Email"
                                 Text="{Binding ViewModel.Email}" />
@@ -114,6 +116,7 @@
                             <ui:TextBlock Text="机器码:" />
                             <ui:TextBox
                                 Width="150"
+                                Height="35"
                                 Margin="10,0,10,0"
                                 PlaceholderText="MachineCode"
                                 Text="{Binding ViewModel.MachineCode}" />
@@ -126,9 +129,23 @@
                                 Text="限制次数:" />
                             <ui:NumberBox
                                 Width="120"
+                                Height="35"
                                 Margin="10,0,10,0"
                                 PlaceholderText="Count"
                                 Value="{Binding ViewModel.TotalRun, Mode=TwoWay}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                            <ui:TextBlock
+                                Margin="0,0,0,0"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                Text="产品名称:" />
+                            <ui:TextBox
+                                Width="120"
+                                Height="35"
+                                Margin="10,0,10,0"
+                                PlaceholderText="名称"
+                                Text="{Binding ViewModel.ProductName, Mode=TwoWay}" />
                         </StackPanel>
                     </UniformGrid>
                     <StackPanel

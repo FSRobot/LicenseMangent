@@ -75,6 +75,7 @@ namespace LicenseManagement.Helpers
         public string Id { get; set; }
         public string Email { get; set; }
         public string Name { get; set; }
+        public string ProductName { get; set; }
         public string MachineCode { get; set; }
         public bool IsBlock { get; set; }
         public DateTime BeginDate { get; set; }
