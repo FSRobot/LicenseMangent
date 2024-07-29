@@ -105,26 +105,30 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTemplateColumn
-                    Width="2*"
+                    Width="3*"
                     Header="操作">
                     <DataGridTemplateColumn.CellTemplate>
                         <ItemContainerTemplate>
-                            <StackPanel
-                                HorizontalAlignment="Center"
+                            <UniformGrid
+                                HorizontalAlignment="Stretch"
                                 VerticalAlignment="Center"
-                                Orientation="Horizontal">
-                                <!--<ui:Button
-                                    HorizontalAlignment="Center"
-                                    Content="详情"
-                                    IsTabStop="True" />-->
+                                Columns="2">
                                 <ui:Button
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
+                                    Width="60"
+                                    Padding="6"
+                                    Command="{Binding ViewModel.ShowDetailsCommand, RelativeSource={RelativeSource AncestorType={x:Type Page}}}"
+                                    CommandParameter="{Binding Id}"
+                                    Content="详情"
+                                    IsTabStop="True" />
+                                <ui:Button
+                                    Width="60"
+                                    Margin="0"
+                                    Padding="6"
                                     Command="{Binding ViewModel.CopyLicenseCodeCommand, RelativeSource={RelativeSource AncestorType={x:Type Page}}}"
                                     CommandParameter="{Binding Id}"
                                     Content="激活码"
                                     IsTabStop="True" />
-                            </StackPanel>
+                            </UniformGrid>
                         </ItemContainerTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

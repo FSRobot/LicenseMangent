@@ -14,6 +14,7 @@ using Microsoft.Extensions.Hosting;
 using System.IO;
 using System.Reflection;
 using System.Windows.Threading;
+using CommonModel;
 using LicenseManagement.Helpers;
 using LicenseManagement.SQLite;
 using Microsoft.EntityFrameworkCore;

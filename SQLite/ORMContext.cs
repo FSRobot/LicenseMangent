@@ -14,6 +14,7 @@ namespace LicenseManagement.SQLite
 
         public DbSet<RsaLicenseModel> RsaLicense => Set<RsaLicenseModel>();
         public DbSet<RsaSecretModel> RsaSecret => Set<RsaSecretModel>();
+        public DbSet<OemModel> Oem => Set<OemModel>();
     }
 
     public class DbContextFactory : IDesignTimeDbContextFactory<DataContext>

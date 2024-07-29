@@ -16,15 +16,20 @@
     ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     mc:Ignorable="d">
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Wpf.Ui;component/controls/textbox/textbox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/WPf.Ui;component/controls/numberbox/numberbox.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/WPf.Ui;component/controls/combobox/combobox.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
 
     <Grid
         MinHeight="{Binding ViewModel.DesignHeight}"
         VerticalAlignment="Top"
         ShowGridLines="False">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition />
@@ -42,29 +47,32 @@
             <ui:CardExpander.Header>
                 <TextBlock
                     VerticalAlignment="Center"
-                    Text="Public Key" />
+                    Text="Public Key"
+                    TextWrapping="WrapWithOverflow" />
             </ui:CardExpander.Header>
             <ui:TextBlock
                 Text="{Binding ViewModel.PublicKey}"
                 TextWrapping="Wrap" />
         </ui:CardExpander>
-        <ui:CardExpander
+        <!--<ui:CardExpander
             Grid.Row="0"
             Grid.Column="1"
             Margin="20,0,20,20"
             VerticalAlignment="Top"
             HorizontalContentAlignment="Right"
             VerticalContentAlignment="Center"
-            Icon="{ui:SymbolIcon LockClosed24}">
+            Icon="{ui:SymbolIcon LockClosed24}"
+            Visibility="Hidden">
             <ui:CardExpander.Header>
                 <TextBlock
                     VerticalAlignment="Center"
-                    Text="Private Key" />
+                    Text="Private Key"
+                    TextWrapping="WrapWithOverflow" />
             </ui:CardExpander.Header>
             <ui:TextBlock
                 Text="{Binding ViewModel.PrivateKey}"
                 TextWrapping="Wrap" />
-        </ui:CardExpander>
+        </ui:CardExpander>-->
 
         <Grid
             Grid.Row="1"
@@ -85,68 +93,127 @@
                     </Grid.RowDefinitions>
                     <UniformGrid
                         Margin="10,0,0,0"
-                        HorizontalAlignment="Center"
+                        HorizontalAlignment="Stretch"
                         Columns="4">
                         <UniformGrid.Resources>
                             <Style TargetType="ui:TextBlock">
                                 <Setter Property="FontSize" Value="14" />
                                 <Setter Property="HorizontalAlignment" Value="Right" />
+                                <Setter Property="TextWrapping" Value="WrapWithOverflow" />
                                 <Setter Property="VerticalAlignment" Value="Center" />
                             </Style>
+                            <Style
+                                BasedOn="{StaticResource DefaultUiTextBoxStyle}"
+                                TargetType="ui:TextBox">
+                                <Setter Property="MinWidth" Value="0" />
+                                <Setter Property="Margin" Value="10,0,10,0" />
+                                <Setter Property="Height" Value="35" />
+                            </Style>
+                            <Style
+                                BasedOn="{StaticResource DefaultUiNumberBoxStyle}"
+                                TargetType="ui:NumberBox">
+                                <Setter Property="MinWidth" Value="0" />
+                                <Setter Property="Height" Value="35" />
+                                <Setter Property="Margin" Value="10,0,10,0" />
+                            </Style>
+                            <Style
+                                BasedOn="{StaticResource DefaultComboBoxStyle}"
+                                TargetType="ComboBox">
+                                <Setter Property="MinWidth" Value="0" />
+                                <Setter Property="Height" Value="35" />
+                                <Setter Property="Margin" Value="10,0,10,0" />
+                            </Style>
+                            <Style TargetType="Grid">
+                                <Setter Property="Margin" Value="0,5,0,0" />
+                            </Style>
                         </UniformGrid.Resources>
-                        <StackPanel Orientation="Horizontal">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width=".4*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
                             <ui:TextBlock Text="客户名称:" />
                             <ui:TextBox
-                                Width="130"
-                                Height="35"
-                                Margin="10,0,10,0"
-                                PlaceholderText="Name"
+                                Grid.Column="1"
                                 Text="{Binding ViewModel.Name}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width=".4*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
                             <ui:TextBlock Text="客户邮箱:" />
                             <ui:TextBox
-                                Width="150"
-                                Height="35"
-                                Margin="10,0,10,0"
-                                PlaceholderText="Email"
+                                Grid.Column="1"
                                 Text="{Binding ViewModel.Email}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width=".4*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
                             <ui:TextBlock Text="机器码:" />
                             <ui:TextBox
-                                Width="150"
-                                Height="35"
-                                Margin="10,0,10,0"
-                                PlaceholderText="MachineCode"
+                                Grid.Column="1"
                                 Text="{Binding ViewModel.MachineCode}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width=".4*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
                             <ui:TextBlock
-                                Margin="10,0,0,0"
                                 VerticalAlignment="Center"
                                 FontSize="14"
                                 Text="限制次数:" />
                             <ui:NumberBox
-                                Width="120"
-                                Height="35"
-                                Margin="10,0,10,0"
-                                PlaceholderText="Count"
+                                Grid.Column="1"
+                                SpinButtonPlacementMode="Hidden"
                                 Value="{Binding ViewModel.TotalRun, Mode=TwoWay}" />
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width=".4*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
                             <ui:TextBlock
                                 Margin="0,0,0,0"
                                 VerticalAlignment="Center"
                                 FontSize="14"
                                 Text="产品名称:" />
+                            <ComboBox
+                                Grid.Column="1"
+                                SelectedIndex="0"
+                                SelectedValue="{Binding ViewModel.ProductName}"
+                                SelectedValuePath="Content">
+                                <ComboBoxItem Content="NCAM" />
+                                <ComboBoxItem Content="EcsSpy" />
+                                <ComboBoxItem Content="OEMLicenseGenerator" />
+                            </ComboBox>
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width=".4*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <ui:TextBlock Text="备注:" />
                             <ui:TextBox
-                                Width="120"
-                                Height="35"
-                                Margin="10,0,10,0"
-                                PlaceholderText="名称"
-                                Text="{Binding ViewModel.ProductName, Mode=TwoWay}" />
-                        </StackPanel>
+                                Grid.Column="1"
+                                Text="{Binding ViewModel.Comment}" />
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width=".4*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <ui:TextBlock Text="OEM:" />
+                            <ComboBox
+                                Grid.Column="1"
+                                DisplayMemberPath="Name"
+                                ItemsSource="{Binding ViewModel.OEMSource}"
+                                SelectedValue="{Binding ViewModel.OEMId}"
+                                SelectedValuePath="Id" />
+                        </Grid>
                     </UniformGrid>
                     <StackPanel
                         Grid.Row="1"

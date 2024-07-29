@@ -11,14 +11,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LicenseManagement.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240314053605_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20240726040157_Add-Field-ProductName")]
+    partial class AddFieldProductName
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.3");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.7");
 
             modelBuilder.Entity("LicenseManagement.SQLite.Models.RsaLicenseModel", b =>
                 {
@@ -29,6 +29,10 @@ namespace LicenseManagement.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Comment")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -65,6 +69,10 @@ namespace LicenseManagement.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("OpName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ProductName")
                         .IsRequired()
                         .HasColumnType("TEXT");
 

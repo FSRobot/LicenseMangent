@@ -3,17 +3,13 @@
 // Copyright (C) Leszek Pomianowski and WPF UI Contributors.
 // All Rights Reserved.
 
-using System.IO;
-using LicenseManagement.Models;
-using System.Windows.Media;
-using LicenseManagement.Helpers;
-using LicenseManagement.ViewModels.Common;
-using Wpf.Ui.Controls;
 using LicenseManagement.SQLite;
-using Wpf.Ui;
-using MessageBox = System.Windows.MessageBox;
-using Wpf.Ui.Extensions;
+using Newtonsoft.Json;
 using System.Diagnostics;
+using CommonModel;
+using Wpf.Ui;
+using Wpf.Ui.Controls;
+using Wpf.Ui.Extensions;
 
 namespace LicenseManagement.ViewModels.Pages
 {
@@ -59,11 +55,14 @@ namespace LicenseManagement.ViewModels.Pages
                     Count = data.Count,
                     DisableFunctionList = data.DisableFunctionList,
                     DisableVersionList = data.DisableVersionList,
-                    Email =data.Email,
+                    Email = data.Email,
                     EndDate = data.EndDate,
+                    Comment = data.Comment,
+                    ProductName = data.ProductName,
                     Id = data.Id,
                     IsBlock = data.IsBlock,
                     MachineCode = data.MachineCode,
+                    OemId = data.OemId,
                     Name = data.Name
                 });
             }
@@ -79,14 +78,14 @@ namespace LicenseManagement.ViewModels.Pages
             var result = Context.RsaLicense.FirstOrDefault(x => id.Equals(x.Id));
             if (result == null)
             {
-                SnackbarService.Show("提示","复制失败,未查询到当前id的激活码!");
+                SnackbarService.Show("提示", "复制失败,未查询到当前id的激活码!");
             }
             else
             {
                 try
                 {
                     Clipboard.Clear();
-                    Clipboard.SetText(result.Code);
+                    Clipboard.SetText($"reg add HKLM\\SOFTWARE\\WOW6432Node\\JKSoft /v {result.ProductName} /t REG_SZ /d {result.Code.ToString()}");
                 }
                 catch (Exception e)
                 {
@@ -94,6 +93,23 @@ namespace LicenseManagement.ViewModels.Pages
                 }
                 SnackbarService.Show("提示", "复制成功!");
             }
+        }
+
+        [RelayCommand]
+        public void ShowDetails(string id)
+        {
+            var result = Context.RsaLicense.FirstOrDefault(x => id.Equals(x.Id));
+            var content = JsonConvert.SerializeObject(result, Formatting.Indented);
+            try
+            {
+                Clipboard.Clear();
+                Clipboard.SetText(content);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+            }
+            SnackbarService.Show("详情", content);
         }
     }
 }

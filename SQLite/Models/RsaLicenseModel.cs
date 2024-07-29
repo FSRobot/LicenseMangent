@@ -14,6 +14,8 @@ namespace LicenseManagement.SQLite.Models
         public string Email { get; set; }
         public string Name { get; set; }
         public string MachineCode { get; set; }
+        public string Comment { get; set; }
+        public string ProductName { get; set; }
         public bool IsBlock { get; set; }
         public DateTime BeginDate { get; set; }
         public DateTime EndDate { get; set; }
@@ -22,6 +24,7 @@ namespace LicenseManagement.SQLite.Models
         public string DisableVersionList { get; set; }
         public string Code { get; set; }
         public DateTime CreateDate { get; set; }
-        public string OpName { get; set; }
+        public Guid OpId{ get; set; }
+        public Guid OemId{ get; set; }
     }
 }

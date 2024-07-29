@@ -3,6 +3,10 @@
 // Copyright (C) Leszek Pomianowski and WPF UI Contributors.
 // All Rights Reserved.
 
+using CommonModel;
+using LicenseManagement.SQLite;
+using LicenseManagement.SQLite.Models;
+using Wpf.Ui;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 
@@ -12,8 +16,22 @@ namespace LicenseManagement.ViewModels.Pages
     {
         private bool _isInitialized = false;
 
+
+        private readonly DataContext Context;
+        private readonly ISnackbarService snackbarService;
+        private readonly LicenseHelper Helper;
+        public SettingsViewModel(DataContext context, ISnackbarService snackbarService, LicenseHelper helper)
+        {
+            Context = context;
+            this.snackbarService = snackbarService;
+            this.Helper = helper;
+        }
+
         [ObservableProperty]
         private string _appVersion = String.Empty;
+
+        [ObservableProperty]
+        private string _OemName = String.Empty;
 
         [ObservableProperty]
         private ApplicationTheme _currentTheme = ApplicationTheme.Unknown;
@@ -63,6 +81,58 @@ namespace LicenseManagement.ViewModels.Pages
 
                     break;
             }
+        }
+
+        [RelayCommand]
+        private void CreateOem()
+        {
+            if (string.IsNullOrWhiteSpace(OemName))
+            {
+                snackbarService.Show
+                (
+                    "提示",
+                    "名称不允许为空!",
+                    ControlAppearance.Danger,
+                    new SymbolIcon(SymbolRegular.ErrorCircle24),
+                    TimeSpan.FromSeconds(5)
+                );
+                return;
+            }
+
+            if (Context.Oem.Any(x => x.Name.Equals(OemName.ToUpper())))
+            {
+                snackbarService.Show
+                (
+                    "提示",
+                    "已存在该厂商!",
+                    ControlAppearance.Danger,
+                    new SymbolIcon(SymbolRegular.ErrorCircle24),
+                    TimeSpan.FromSeconds(5)
+                );
+                return;
+            }
+
+            var keyPair = Helper.GenerateNewKeyPair();
+
+            Context.Oem.Add(new OemModel()
+            {
+                CreateTime = DateTime.Now,
+                Id = Guid.NewGuid(),
+                Name = OemName.ToUpper(),
+                OpId = Guid.Empty,
+                PublickKey = keyPair.PublicKey,
+                SecretKey = keyPair.PrivateKey
+            });
+            Context.SaveChanges();
+
+            snackbarService.Show
+            (
+                "提示",
+                "新增成功!",
+                ControlAppearance.Success,
+                new SymbolIcon(SymbolRegular.Add24),
+                TimeSpan.FromSeconds(3)
+            );
         }
     }
 }

@@ -3,19 +3,22 @@
 // Copyright (C) Leszek Pomianowski and WPF UI Contributors.
 // All Rights Reserved.
 
-using LicenseManagement.Helpers;
-using System.Diagnostics;
-using System.IO;
+using System.Collections.ObjectModel;
+using CommonModel;
+using CommonModel.Encryption;
 using LicenseManagement.SQLite;
 using LicenseManagement.SQLite.Models;
-using LicenseManagement.ViewModels.Common;
+using System.Diagnostics;
+using System.IO;
+using LicenseChecker;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Wpf.Ui;
 using Wpf.Ui.Controls;
 
 namespace LicenseManagement.ViewModels.Pages
 {
-    public partial class DashboardViewModel : ObservableObject
+    public partial class DashboardViewModel : ObservableObject, INavigationAware
     {
         private readonly LicenseHelper Helper;
         public readonly ISnackbarService SnackbarService;
@@ -27,9 +30,11 @@ namespace LicenseManagement.ViewModels.Pages
             Context = context;
 
             LoadData();
-
-            PrivateKey = helper.SecretKey.PrivateKey;
-            PublicKey = helper.SecretKey.PublicKey;
+            if (string.IsNullOrWhiteSpace(PrivateKey))
+            {
+                PrivateKey = Helper.SecretKey.PrivateKey;
+                PublicKey = Helper.SecretKey.PublicKey;
+            }
         }
 
         [ObservableProperty]
@@ -42,12 +47,15 @@ namespace LicenseManagement.ViewModels.Pages
         [ObservableProperty] private string _name = string.Empty;
         [ObservableProperty] private string _email = string.Empty;
         [ObservableProperty] private string _machineCode = string.Empty;
+        [ObservableProperty] private string _comment = string.Empty;
         [ObservableProperty] private string _productName = string.Empty;
         [ObservableProperty] private int _totalRun = -1;
         [ObservableProperty] private DateTime _beginDate = DateTime.Now;
         [ObservableProperty] private DateTime _endDate = DateTime.MaxValue;
         [ObservableProperty] private string _disableFunctionList = string.Empty;
         [ObservableProperty] private string _disableVersionList = string.Empty;
+        [ObservableProperty] private ObservableCollection<OemModel> _OEMSource = new();
+        [ObservableProperty] private Guid _OEMId = Guid.Empty;
 
         [RelayCommand]
         private void ChangeYearRange(object obj)
@@ -60,6 +68,28 @@ namespace LicenseManagement.ViewModels.Pages
         [RelayCommand]
         private void OnSubmit()
         {
+            if (Guid.Empty.Equals(OEMId))
+            {
+                SnackbarService.Show(
+                    "授权",
+                    "OEM禁止为空!",
+                    ControlAppearance.Primary,
+                    new SymbolIcon(SymbolRegular.ErrorCircle24),
+                    TimeSpan.FromSeconds(5));
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(ProductName))
+            {
+                SnackbarService.Show(
+                    "授权",
+                    "产品名称禁止为空!",
+                    ControlAppearance.Primary,
+                    new SymbolIcon(SymbolRegular.ErrorCircle24),
+                    TimeSpan.FromSeconds(5));
+                return;
+            }
+
             License license = new()
             {
                 Id = Guid.NewGuid().ToString("N"),
@@ -67,13 +97,24 @@ namespace LicenseManagement.ViewModels.Pages
                 Name = Name,
                 Email = Email,
                 MachineCode = MachineCode,
+                Comment = Comment,
                 BeginDate = BeginDate,
                 EndDate = EndDate,
                 Count = TotalRun,
+                OemId = OEMId,
                 DisableFunctionList = DisableFunctionList,
                 DisableVersionList = DisableVersionList,
+                OemPublicKey = GetOemPublicKey(OEMId),
                 IsBlock = false
             };
+
+            // 如果是厂家授权软件删除公钥保留私钥
+            if (ProductName.Equals("OEMLicenseGenerator"))
+            {
+                license.OemPrivateKey = GetOemPrivateKey(OEMId);
+                license.OemPublicKey = string.Empty;
+            }
+
             var details = Helper.Encrypt(license);
             SnackbarService.Show("授权", "成功!",
                 ControlAppearance.Primary, null, TimeSpan.FromSeconds(5));
@@ -84,32 +125,34 @@ namespace LicenseManagement.ViewModels.Pages
                 Name = license.Name,
                 Email = license.Email,
                 MachineCode = license.MachineCode,
+                Comment = license.Comment,
                 BeginDate = license.BeginDate,
                 EndDate = license.EndDate,
                 Count = license.Count,
+                ProductName = license.ProductName,
                 DisableFunctionList = DisableFunctionList,
                 DisableVersionList = DisableVersionList,
                 IsBlock = false,
-                OpName = "",
+                OpId = Guid.Empty,
+                OemId = OEMId,
                 CreateDate = DateTime.Now,
                 Code = details.ToString()
             });
             Context.SaveChanges();
 
-            try
+            LicenseCode licenseCode = new()
             {
-                //reg add HKLM\SOFTWARE\WOW6432Node\JKSoft /v product /t REG_SZ /d "激活码"
-                Clipboard.Clear();
-                Clipboard.SetText($"reg add HKLM\\SOFTWARE\\WOW6432Node\\JKSoft /v {license.ProductName} /t REG_SZ /d {details.ToString()}");
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e);
-            }
-            
+                Code = details.ToString(),
+                ProductName = license.ProductName
+            };
+
+            var content = JsonConvert.SerializeObject(licenseCode);
+            File.WriteAllText(LicenseCheck.DesktopPath + "\\" + LicenseCheck.LicensePath, content);
+
             Name = string.Empty;
             Email = string.Empty;
             MachineCode = string.Empty;
+            Comment = string.Empty;
             BeginDate = DateTime.Now;
             EndDate = DateTime.MaxValue;
             TotalRun = -1;
@@ -141,6 +184,49 @@ namespace LicenseManagement.ViewModels.Pages
                 });
                 Context.SaveChanges();
             }
+        }
+
+        private void LoadOEM()
+        {
+            OEMSource.Clear();
+            var keySet = Context.Oem.ToList();
+            foreach (var key in keySet)
+            {
+                OEMSource.Add(key);
+            }
+
+            if (Guid.Empty.Equals(OEMId) && OEMSource.Count != 0)
+            {
+                OEMId = OEMSource.First().Id;
+            }
+            else
+            {
+                var id = OEMId;
+                OEMId = Guid.Empty;
+                OEMId = id;
+            }
+        }
+
+        private string GetOemPublicKey(Guid id)
+        {
+            var keySet = OEMSource.First(x => x.Id.Equals(id));
+            return keySet == null ? string.Empty : keySet.PublickKey;
+
+        }
+
+        private string GetOemPrivateKey(Guid id)
+        {
+            var keySet = Context.Oem.FirstOrDefault(x => x.Id.Equals(id));
+            return keySet == null ? string.Empty : keySet.SecretKey;
+        }
+
+        public void OnNavigatedTo()
+        {
+            LoadOEM();
+        }
+
+        public void OnNavigatedFrom()
+        {
         }
     }
 }
